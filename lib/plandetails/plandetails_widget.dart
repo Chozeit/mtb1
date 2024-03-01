@@ -234,6 +234,7 @@ class _PlandetailsWidgetState extends State<PlandetailsWidget> {
                                                     0.0, 0.0),
                                                 child: FFButtonWidget(
                                                   onPressed: () async {
+                                                    // String mealPlanId =
                                                     context.pushNamed(
                                                       'buynowplans',
                                                       queryParameters: {
@@ -244,6 +245,7 @@ class _PlandetailsWidgetState extends State<PlandetailsWidget> {
                                                           ParamType
                                                               .DocumentReference,
                                                         ),
+                                                        // 'mealPlanId': mealPlanId,
                                                       }.withoutNulls,
                                                     );
                                                   },

@@ -30,23 +30,22 @@ class FFAppState extends ChangeNotifier {
     _cart = _value;
   }
 
-  void addToCart(CartItemTypeStruct _value, BuildContext context) {
-    if (_cart.isNotEmpty) {
-      // Assuming each plan has a unique type or identifier that distinguishes it from other items
-      // Adjust the condition based on your data model
-      if (_cart.any((item) => item == 'plan')) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("You can only have one plan in the cart."),
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-    }
-    _cart.add(_value);
-    notifyListeners();
+  // void addToCart(PlansRecord selectedPlan) {
+  //   var newItem = CartItemTypeStruct(
+  //     planRef: selectedPlan.reference,
+  //     quantity: 1, // or any quantity logic you have
+  //     mealPlanId: selectedPlan.mealPlanId, // Ensure this exists in PlansRecord
+  //   );
+  //   // Directly add newItem to the _cart list
+  //   _cart.add(newItem);
+  //   notifyListeners(); // Notify listeners about the state change
+  // }
+// This method now directly accepts a CartItemTypeStruct object.
+  void addToCart(CartItemTypeStruct newItem) {
+    _cart.add(newItem);
+    notifyListeners(); // Notify listeners about the change.
   }
+
 
 
   void removeFromCart(CartItemTypeStruct _value) {

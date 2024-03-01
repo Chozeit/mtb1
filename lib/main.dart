@@ -117,6 +117,7 @@ class _NavBarPageState extends State<NavBarPage> {
 
   @override
   Widget build(BuildContext context) {
+
     final tabs = {
       'Home': HomeWidget(),
       'plans': PlansWidget(),

@@ -25,10 +25,16 @@ class MealplanRecord extends FirestoreRecord {
   String? _image;
   String get image => _image ?? '';
   bool hasImage() => _image != null;
+  // "image" field.
+  String? _mealPlanId;
+  String get mealPlanId => _mealPlanId ?? '';
+  bool hasMealPlanId() => _mealPlanId != null;
+
 
   void _initializeFields() {
     _name = snapshotData['name'] as String?;
     _image = snapshotData['image'] as String?;
+    _mealPlanId = snapshotData['mealPlanId'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -44,6 +50,7 @@ class MealplanRecord extends FirestoreRecord {
       MealplanRecord._(
         snapshot.reference,
         mapFromFirestore(snapshot.data() as Map<String, dynamic>),
+
       );
 
   static MealplanRecord getDocumentFromData(
@@ -53,8 +60,8 @@ class MealplanRecord extends FirestoreRecord {
       MealplanRecord._(reference, mapFromFirestore(data));
 
   @override
-  String toString() =>
-      'MealplanRecord(reference: ${reference.path}, data: $snapshotData)';
+  String toString() => 'MealplanRecord(reference: ${reference.path}, data: $snapshotData, mealPlanId: $_mealPlanId)';
+
 
   @override
   int get hashCode => reference.path.hashCode;
@@ -68,11 +75,13 @@ class MealplanRecord extends FirestoreRecord {
 Map<String, dynamic> createMealplanRecordData({
   String? name,
   String? image,
+  String? mealPlanId,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
       'name': name,
       'image': image,
+      'mealPlanId': mealPlanId,
     }.withoutNulls,
   );
 
@@ -84,11 +93,12 @@ class MealplanRecordDocumentEquality implements Equality<MealplanRecord> {
 
   @override
   bool equals(MealplanRecord? e1, MealplanRecord? e2) {
-    return e1?.name == e2?.name && e1?.image == e2?.image;
+    return e1?.name == e2?.name && e1?.image == e2?.image && e1?.mealPlanId == e2?.mealPlanId;
   }
 
   @override
-  int hash(MealplanRecord? e) => const ListEquality().hash([e?.name, e?.image]);
+  int hash(MealplanRecord? e) => const ListEquality().hash([e?.name, e?.image, e?.mealPlanId]);
+
 
   @override
   bool isValidKey(Object? o) => o is MealplanRecord;

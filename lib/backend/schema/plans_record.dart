@@ -31,14 +31,20 @@ class PlansRecord extends FirestoreRecord {
   double get price => _price ?? 0.0;
   bool hasPrice() => _price != null;
 
+  // "mealPlanId" field.
+  String? _mealPlanId;
+  String get mealPlanId => _mealPlanId ?? '';
+  bool hasMealPlanId() => _mealPlanId != null;
+
+
   DocumentReference get parentReference => reference.parent.parent!;
 
   void _initializeFields() {
     _item = snapshotData['item'] as String?;
     _image = snapshotData['image'] as String?;
     _price = castToType<double>(snapshotData['price']);
+    _mealPlanId = snapshotData['mealPlanId'] as String?;
   }
-
   static Query<Map<String, dynamic>> collection([DocumentReference? parent]) =>
       parent != null
           ? parent.collection('plans')
@@ -66,7 +72,8 @@ class PlansRecord extends FirestoreRecord {
 
   @override
   String toString() =>
-      'PlansRecord(reference: ${reference.path}, data: $snapshotData)';
+      'PlansRecord(reference: ${reference.path}, data: $snapshotData, mealPlanId: $_mealPlanId)';
+
 
   @override
   int get hashCode => reference.path.hashCode;
@@ -81,12 +88,14 @@ Map<String, dynamic> createPlansRecordData({
   String? item,
   String? image,
   double? price,
+  String? mealPlanId,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
       'item': item,
       'image': image,
       'price': price,
+      'mealPlanId': mealPlanId,
     }.withoutNulls,
   );
 
@@ -100,12 +109,13 @@ class PlansRecordDocumentEquality implements Equality<PlansRecord> {
   bool equals(PlansRecord? e1, PlansRecord? e2) {
     return e1?.item == e2?.item &&
         e1?.image == e2?.image &&
-        e1?.price == e2?.price;
+        e1?.price == e2?.price &&
+        e1?.mealPlanId == e2?.mealPlanId; // Include mealPlanId in equality check
   }
 
   @override
   int hash(PlansRecord? e) =>
-      const ListEquality().hash([e?.item, e?.image, e?.price]);
+      const ListEquality().hash([e?.item, e?.image, e?.price, e?.mealPlanId]);
 
   @override
   bool isValidKey(Object? o) => o is PlansRecord;

@@ -15,9 +15,11 @@ class BuynowplansWidget extends StatefulWidget {
   const BuynowplansWidget({
     super.key,
     this.planRef,
+    this.mealPlanId,
   });
 
   final DocumentReference? planRef;
+  final String? mealPlanId;
 
   @override
   State<BuynowplansWidget> createState() => _BuynowplansWidgetState();
@@ -183,11 +185,13 @@ class _BuynowplansWidgetState extends State<BuynowplansWidget> {
                       child: FFButtonWidget(
                         onPressed: () async {
                           setState(() {
+                            String? mealPlanId = buynowplansPlansRecord.mealPlanId;
                             FFAppState().addToCart(CartItemTypeStruct(
                               planRef: buynowplansPlansRecord.reference,
                               quantity: 1,
+                              mealPlanId: mealPlanId,
                             ),
-                            context);
+                            );
                             FFAppState().cartSum = FFAppState().cartSum +
                                 buynowplansPlansRecord.price;
                           });

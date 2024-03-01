@@ -12,9 +12,11 @@ class CartItemTypeStruct extends FFFirebaseStruct {
   CartItemTypeStruct({
     DocumentReference? planRef,
     int? quantity,
+    String? mealPlanId, // Add mealPlanId
     FirestoreUtilData firestoreUtilData = const FirestoreUtilData(),
   })  : _planRef = planRef,
         _quantity = quantity,
+        _mealPlanId = mealPlanId, // Initialize mealPlanId
         super(firestoreUtilData);
 
   // "planRef" field.
@@ -29,11 +31,16 @@ class CartItemTypeStruct extends FFFirebaseStruct {
   set quantity(int? val) => _quantity = val;
   void incrementQuantity(int amount) => _quantity = quantity + amount;
   bool hasQuantity() => _quantity != null;
+  // "mealPlanId" field
+  String? _mealPlanId;
+  String? get mealPlanId => _mealPlanId;
+  set mealPlanId(String? val) => _mealPlanId = val;
 
   static CartItemTypeStruct fromMap(Map<String, dynamic> data) =>
       CartItemTypeStruct(
         planRef: data['planRef'] as DocumentReference?,
         quantity: castToType<int>(data['quantity']),
+        mealPlanId: data['mealPlanId'] as String?, // Handle mealPlanId
       );
 
   static CartItemTypeStruct? maybeFromMap(dynamic data) => data is Map
@@ -43,6 +50,7 @@ class CartItemTypeStruct extends FFFirebaseStruct {
   Map<String, dynamic> toMap() => {
         'planRef': _planRef,
         'quantity': _quantity,
+    'mealPlanId': _mealPlanId,
       }.withoutNulls;
 
   @override
@@ -55,6 +63,10 @@ class CartItemTypeStruct extends FFFirebaseStruct {
           _quantity,
           ParamType.int,
         ),
+    'mealPlanId': serializeParam( // Serialize mealPlanId
+      _mealPlanId,
+      ParamType.String,
+    ),
       }.withoutNulls;
 
   static CartItemTypeStruct fromSerializableMap(Map<String, dynamic> data) =>
@@ -68,6 +80,11 @@ class CartItemTypeStruct extends FFFirebaseStruct {
         quantity: deserializeParam(
           data['quantity'],
           ParamType.int,
+          false,
+        ),
+        mealPlanId: deserializeParam( // Deserialize mealPlanId
+          data['mealPlanId'],
+          ParamType.String,
           false,
         ),
       );

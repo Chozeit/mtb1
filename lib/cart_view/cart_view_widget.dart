@@ -24,18 +24,20 @@ class _CartViewWidgetState extends State<CartViewWidget> {
   // bool get isCheckoutEnabled => FFAppState().cart.length == 1;
   // String? get errorMessage => isCheckoutEnabled ? null : 'Please add exactly one plan to the cart before checkout.';
   bool get isCheckoutEnabled {
-    // Create a map to track the number of items from each meal plan.
+    // Count items per meal plan.
     final Map<String, int> mealPlanCounts = {};
     for (final cartItem in FFAppState().cart) {
-      // Assuming you have a way to determine the meal plan ID from the cart item.
-      // You might need to adjust this part based on how you're storing this information.
-      final mealPlanId = cartItem.mealplanRef.mealPlanId; // This is a placeholder.
+      final mealPlanId = cartItem.mealPlanId ?? 'unknown';
       mealPlanCounts[mealPlanId] = (mealPlanCounts[mealPlanId] ?? 0) + 1;
     }
 
-    // Check if any meal plan has more than one item.
+    // Enable checkout if there's at most one item per meal plan.
     return mealPlanCounts.values.every((count) => count == 1);
   }
+
+
+    // Check if any meal plan has more than one item.
+
   String? get errorMessage {
     if (FFAppState().cart.isEmpty) {
       return 'Your cart is empty.';
@@ -49,7 +51,7 @@ class _CartViewWidgetState extends State<CartViewWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   void navigateToCheckout(BuildContext context) {
     // Check if the cart has more than one item or no items at all.
-    if (FFAppState().cart.isEmpty || FFAppState().cart.length > 1) {
+    if (!isCheckoutEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Please add exactly one plan to the cart before checkout."),
@@ -76,9 +78,8 @@ class _CartViewWidgetState extends State<CartViewWidget> {
     // Navigate to checkout if the conditions are met.
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => CheckoutWidget(),
-      ),
+      MaterialPageRoute(builder: (context) => CheckoutWidget()),
+
     );
   }
 
@@ -188,7 +189,7 @@ class _CartViewWidgetState extends State<CartViewWidget> {
                                     final containerPlansRecord = snapshot.data!;
                                     return Container(
                                       width: double.infinity,
-                                      height: 100.0,
+                                      height: 160.0,
                                       decoration: BoxDecoration(
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryBackground,
