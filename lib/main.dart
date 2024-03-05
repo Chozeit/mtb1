@@ -23,6 +23,7 @@ void main() async {
   final appState = FFAppState(); // Initialize FFAppState
   await appState.initializePersistedState();
 
+
   runApp(ChangeNotifierProvider(
     create: (context) => appState,
     child: MyApp(),
@@ -31,6 +32,7 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+
   @override
   State<MyApp> createState() => _MyAppState();
 
@@ -47,6 +49,8 @@ class _MyAppState extends State<MyApp> {
   late GoRouter _router;
 
   final authUserSub = authenticatedUserStream.listen((_) {});
+
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {

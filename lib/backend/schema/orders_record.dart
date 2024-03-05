@@ -26,6 +26,10 @@ class OrdersRecord extends FirestoreRecord {
   String get status => _status ?? '';
   bool hasStatus() => _status != null;
 
+  String? _uid;
+  String get uid => _uid ?? '';
+  bool hasUid() => _uid != null;
+
   // "items" field.
   List<CartItemTypeStruct>? _items;
   List<CartItemTypeStruct> get items => _items ?? const [];
@@ -33,9 +37,11 @@ class OrdersRecord extends FirestoreRecord {
 
   DocumentReference get parentReference => reference.parent.parent!;
 
+
   void _initializeFields() {
     _timestamp = snapshotData['timestamp'] as DateTime?;
     _status = snapshotData['status'] as String?;
+    _uid = snapshotData['uid'] as String?;
     _items = getStructList(
       snapshotData['items'],
       CartItemTypeStruct.fromMap,
@@ -61,6 +67,12 @@ class OrdersRecord extends FirestoreRecord {
         mapFromFirestore(snapshot.data() as Map<String, dynamic>),
       );
 
+  static Query<Map<String, dynamic>> queryUserOrders(String uid) {
+    return FirebaseFirestore.instance
+        .collection('orders')
+        .where('uid', isEqualTo: uid);
+  }
+
   static OrdersRecord getDocumentFromData(
     Map<String, dynamic> data,
     DocumentReference reference,
@@ -81,11 +93,13 @@ class OrdersRecord extends FirestoreRecord {
 }
 
 Map<String, dynamic> createOrdersRecordData({
+  String? uid,
   DateTime? timestamp,
   String? status,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
+      'uid': uid,
       'timestamp': timestamp,
       'status': status,
     }.withoutNulls,
@@ -111,4 +125,5 @@ class OrdersRecordDocumentEquality implements Equality<OrdersRecord> {
 
   @override
   bool isValidKey(Object? o) => o is OrdersRecord;
+
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:page_transition/page_transition.dart';
@@ -79,6 +80,24 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       initialLocation: '/',
       debugLogDiagnostics: true,
       refreshListenable: appStateNotifier,
+      redirect: (BuildContext context, GoRouterState state) async {
+    // Assuming you have a way to determine if a user is logged in
+        final bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
+
+    // If trying to navigate to a protected route while not logged in, redirect to login
+        final bool isLoggingIn = state.location == '/login';
+         if (!isLoggedIn && !isLoggingIn) {
+           return '/login';
+          }
+
+    // If the user is logged in and tries to access the login page, redirect them away
+        if (isLoggedIn && isLoggingIn) {
+        return '/'; // Redirect to home or any other page
+       }
+
+    // No need to redirect
+       return null;
+      },
       errorBuilder: (context, state) =>
           appStateNotifier.loggedIn ? NavBarPage() : LoginWidget(),
       routes: [
@@ -166,6 +185,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => OrdersWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
+
     );
 
 extension NavParamExtensions on Map<String, String?> {

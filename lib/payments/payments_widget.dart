@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_credit_card_form.dart';
@@ -106,22 +108,41 @@ class _PaymentsWidgetState extends State<PaymentsWidget> {
                 padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    await OrdersRecord.createDoc(currentUserReference!).set({
-                      ...createOrdersRecordData(
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      final ordersDocRef = FirebaseFirestore.instance.collection('orders').doc();// Create a new document reference for the order
+
+                      // Prepare the data to be inserted
+                      final orderData = createOrdersRecordData(
                         timestamp: getCurrentTimestamp,
                         status: 'New',
-                      ),
-                      ...mapToFirestore(
-                        {
-                          'items': getCartItemTypeListFirestoreData(
-                            FFAppState().cart,
-                          ),
-                        },
-                      ),
-                    });
+                        uid: user.uid, // Include the current user's UID
+                      );
 
-                    context.goNamed('Home');
+                      // Combine order items data with other order data
+                      final combinedOrderData = {
+                        ...orderData,
+                        'items': getCartItemTypeListFirestoreData(
+                          FFAppState().cart,
+                        ),
+                      };
+
+                      // Set the data to the new document reference
+                      await ordersDocRef.set(combinedOrderData);
+
+                      // Navigate to the home page after placing the order
+                      context.goNamed('Home');
+                    } else {
+                      // If there is no user logged in, handle accordingly, e.g., showing a login prompt
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('You must be logged in to place an order.'),
+                        ),
+                      );
+                    }
                   },
+
+
                   text: 'Place Order',
                   options: FFButtonOptions(
                     height: 40.0,
