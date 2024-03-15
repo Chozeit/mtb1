@@ -30,6 +30,27 @@ class OrdersRecord extends FirestoreRecord {
   String get uid => _uid ?? '';
   bool hasUid() => _uid != null;
 
+  String? _fullName;
+  String? get fullName => _fullName;
+  bool hasFullName() => _fullName != null;
+
+  String? _classAndSection;
+  String? get classAndSection => _classAndSection;
+  bool hasClassAndSection() => _classAndSection != null;
+
+  String? _school;
+  String? get school => _school;
+  bool hasSchool() => _school != null;
+
+  String? _phoneNumber;
+  String? get phoneNumber => _phoneNumber;
+  bool hasPhoneNumber() => _phoneNumber != null;
+
+  String? _specialInstructions;
+  String? get specialInstructions => _specialInstructions;
+  bool hasSpecialInstructions() => _specialInstructions != null;
+
+
   // "items" field.
   List<CartItemTypeStruct>? _items;
   List<CartItemTypeStruct> get items => _items ?? const [];
@@ -46,6 +67,12 @@ class OrdersRecord extends FirestoreRecord {
       snapshotData['items'],
       CartItemTypeStruct.fromMap,
     );
+    _fullName = snapshotData['fullName'] as String?;
+    _classAndSection = snapshotData['classAndSection'] as String?;
+    _school = snapshotData['school'] as String?;
+    _phoneNumber = snapshotData['phoneNumber'] as String?;
+    _specialInstructions = snapshotData['specialInstructions'] as String?;
+
   }
 
   static Query<Map<String, dynamic>> collection([DocumentReference? parent]) =>
@@ -53,9 +80,12 @@ class OrdersRecord extends FirestoreRecord {
           ? parent.collection('orders')
           : FirebaseFirestore.instance.collectionGroup('orders');
 
-  static DocumentReference createDoc(DocumentReference parent, {String? id}) =>
-      parent.collection('orders').doc(id);
-
+  // static DocumentReference createDoc(DocumentReference parent, {String? id}) =>
+  //     parent.collection('orders').doc(id);
+  static DocumentReference createDoc([FirebaseFirestore? firestore]) {
+    firestore ??= FirebaseFirestore.instance;
+    return firestore.collection('orders').doc();
+  }
   static Stream<OrdersRecord> getDocument(DocumentReference ref) =>
       ref.snapshots().map((s) => OrdersRecord.fromSnapshot(s));
 
@@ -96,12 +126,22 @@ Map<String, dynamic> createOrdersRecordData({
   String? uid,
   DateTime? timestamp,
   String? status,
+  String? fullName,
+  String? classAndSection,
+  String? school,
+  String? phoneNumber,
+  String? specialInstructions,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
       'uid': uid,
       'timestamp': timestamp,
       'status': status,
+      'fullName': fullName,
+      'classAndSection': classAndSection,
+      'school': school,
+      'phoneNumber': phoneNumber,
+      'specialInstructions': specialInstructions,
     }.withoutNulls,
   );
 
@@ -116,12 +156,17 @@ class OrdersRecordDocumentEquality implements Equality<OrdersRecord> {
     const listEquality = ListEquality();
     return e1?.timestamp == e2?.timestamp &&
         e1?.status == e2?.status &&
+        e1?.fullName == e2?.fullName &&
+        e1?.classAndSection == e2?.classAndSection &&
+        e1?.school == e2?.school &&
+        e1?.phoneNumber == e2?.phoneNumber &&
+        e1?.specialInstructions == e2?.specialInstructions &&
         listEquality.equals(e1?.items, e2?.items);
   }
 
   @override
   int hash(OrdersRecord? e) =>
-      const ListEquality().hash([e?.timestamp, e?.status, e?.items]);
+      const ListEquality().hash([e?.timestamp, e?.status,e?.fullName,e?.classAndSection,e?.school,e?.phoneNumber,e?.specialInstructions, e?.items]);
 
   @override
   bool isValidKey(Object? o) => o is OrdersRecord;

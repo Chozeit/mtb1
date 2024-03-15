@@ -24,6 +24,12 @@ class CheckoutModel extends FlutterFlowModel<CheckoutWidget> {
   FocusNode? textFieldFocusNode3;
   TextEditingController? textController3;
   String? Function(BuildContext, String?)? textController3Validator;
+  FocusNode? textFieldFocusNode4;
+  TextEditingController? textController4;
+  String? Function(BuildContext, String?)? textController4Validator;
+  FocusNode? textFieldFocusNode5;
+  TextEditingController? textController5;
+  String? Function(BuildContext, String?)? textController5Validator;
 
   /// Initialization and disposal methods.
 
@@ -39,6 +45,10 @@ class CheckoutModel extends FlutterFlowModel<CheckoutWidget> {
 
     textFieldFocusNode3?.dispose();
     textController3?.dispose();
+    textFieldFocusNode4?.dispose();
+    textController4?.dispose();
+    textFieldFocusNode5?.dispose();
+    textController5?.dispose();
   }
 
   /// Action blocks are added here.

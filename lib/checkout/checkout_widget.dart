@@ -1,3 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../backend/schema/orders_record.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -35,6 +38,11 @@ class _CheckoutWidgetState extends State<CheckoutWidget> {
     _model.textController3 ??= TextEditingController();
     _model.textFieldFocusNode3 ??= FocusNode();
 
+    _model.textController4 ??= TextEditingController();
+    _model.textFieldFocusNode4 ??= FocusNode();
+
+    _model.textController5 ??= TextEditingController();
+    _model.textFieldFocusNode5 ??= FocusNode();
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
@@ -198,6 +206,98 @@ class _CheckoutWidgetState extends State<CheckoutWidget> {
                               .asValidator(context),
                         ),
                         TextFormField(
+                          controller: _model.textController4,
+                          focusNode: _model.textFieldFocusNode4,
+                          autofocus: true,
+                          obscureText: false,
+                          decoration: InputDecoration(
+                            labelText: 'School Name',
+                            labelStyle:
+                            FlutterFlowTheme.of(context).labelMedium,
+                            hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).alternate,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).primary,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).error,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).error,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            contentPadding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 12.0, 16.0, 12.0),
+                          ),
+                          style: FlutterFlowTheme.of(context).bodyMedium,
+                          cursorColor: FlutterFlowTheme.of(context).primary,
+                          validator: _model.textController2Validator
+                              .asValidator(context),
+                        ),
+                        TextFormField(
+                          controller: _model.textController5,
+                          focusNode: _model.textFieldFocusNode5,
+                          autofocus: true,
+                          obscureText: false,
+                          decoration: InputDecoration(
+                            labelText: 'Phone Number',
+                            labelStyle:
+                            FlutterFlowTheme.of(context).labelMedium,
+                            hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).alternate,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).primary,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).error,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).error,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            contentPadding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 12.0, 16.0, 12.0),
+                          ),
+                          style: FlutterFlowTheme.of(context).bodyMedium,
+                          cursorColor: FlutterFlowTheme.of(context).primary,
+                          validator: _model.textController2Validator
+                              .asValidator(context),
+                        ),
+                        TextFormField(
                           controller: _model.textController3,
                           focusNode: _model.textFieldFocusNode3,
                           autofocus: true,
@@ -254,7 +354,26 @@ class _CheckoutWidgetState extends State<CheckoutWidget> {
                         EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 12.0),
                     child: FFButtonWidget(
                       onPressed: () async {
-                        context.pushNamed('payments');
+                        final ordersDocRef = OrdersRecord.createDoc();
+
+                        // Now set the data for the new order document including the user details
+                        final orderData = createOrdersRecordData(
+                          uid: FirebaseAuth.instance.currentUser!.uid, // Get the current user's UID
+                          timestamp: DateTime.now(),
+                          status: 'New',
+                          fullName: _model.textController1.text, // Full Name
+                          classAndSection: _model.textController2.text, // Class and Section
+                          school: _model.textController4.text, // School Name
+                          phoneNumber: _model.textController5.text, // Phone Number
+                          specialInstructions: _model.textController3.text, // Special Instructions
+                          // ... include other order details here
+                        );
+
+                        // Save the order to Firestore
+                        await ordersDocRef.set(orderData);
+
+                        // Navigate to the payment page or order confirmation page
+                        context.goNamed('payments');
                       },
                       text: 'Submit and Proceed',
                       icon: Icon(
