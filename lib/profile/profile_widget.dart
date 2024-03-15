@@ -106,8 +106,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           padding: EdgeInsets.all(2.0),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10.0),
-                            child: Image.network(
-                              'https://images.unsplash.com/photo-1592520113018-180c8bc831c9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTI3fHxwcm9maWxlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=900&q=60',
+                            child: Image.asset('assets/prof.png',
                               width: 100.0,
                               height: 100.0,
                               fit: BoxFit.cover,
@@ -176,51 +175,51 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
-                child: Container(
-                  width: double.infinity,
-                  height: 60.0,
-                  decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 5.0,
-                        color: Color(0x3416202A),
-                        offset: Offset(0.0, 2.0),
-                      )
-                    ],
-                    borderRadius: BorderRadius.circular(12.0),
-                    shape: BoxShape.rectangle,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              12.0, 0.0, 0.0, 0.0),
-                          child: Text(
-                            'Change Password',
-                            style: FlutterFlowTheme.of(context).labelMedium,
-                          ),
-                        ),
-                        Expanded(
-                          child: Align(
-                            alignment: AlignmentDirectional(0.9, 0.0),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              color: FlutterFlowTheme.of(context).secondaryText,
-                              size: 18.0,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              // Padding(
+              //   padding: EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+              //   child: Container(
+              //     width: double.infinity,
+              //     height: 60.0,
+              //     decoration: BoxDecoration(
+              //       color: FlutterFlowTheme.of(context).secondaryBackground,
+              //       boxShadow: [
+              //         BoxShadow(
+              //           blurRadius: 5.0,
+              //           color: Color(0x3416202A),
+              //           offset: Offset(0.0, 2.0),
+              //         )
+              //       ],
+              //       borderRadius: BorderRadius.circular(12.0),
+              //       shape: BoxShape.rectangle,
+              //     ),
+              //     // child: Padding(
+              //     //   padding: EdgeInsets.all(8.0),
+              //     //   child: Row(
+              //     //     mainAxisSize: MainAxisSize.max,
+              //     //     children: [
+              //     //       Padding(
+              //     //         padding: EdgeInsetsDirectional.fromSTEB(
+              //     //             12.0, 0.0, 0.0, 0.0),
+              //     //         child: Text(
+              //     //           'Change Password',
+              //     //           style: FlutterFlowTheme.of(context).labelMedium,
+              //     //         ),
+              //     //       ),
+              //     //       Expanded(
+              //     //         child: Align(
+              //     //           alignment: AlignmentDirectional(0.9, 0.0),
+              //     //           child: Icon(
+              //     //             Icons.arrow_forward_ios,
+              //     //             color: FlutterFlowTheme.of(context).secondaryText,
+              //     //             size: 18.0,
+              //     //           ),
+              //     //         ),
+              //     //       ),
+              //     //     ],
+              //     //   ),
+              //     // ),
+              //   ),
+              // ),
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(20.0, 12.0, 20.0, 0.0),
                 child: InkWell(

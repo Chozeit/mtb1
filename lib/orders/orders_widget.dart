@@ -134,78 +134,101 @@ class _OrdersWidgetState extends State<OrdersWidget> {
                       itemCount: listViewOrdersRecordList.length,
                       itemBuilder: (context, listViewIndex) {
                         final listViewOrdersRecord = listViewOrdersRecordList[listViewIndex];
-                        // You can display any image here. If each order item should have an image, you need to adjust this.
-                        // For the sake of this example, I'm using a placeholder image.
-                        return Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 8.0),
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).secondaryBackground,
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 3.0,
-                                  color: Color(0x411D2429),
-                                  offset: Offset(0.0, 1.0),
-                                )
-                              ],
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 1.0, 1.0, 1.0),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(6.0),
-                                      child: Image.network(
-                                        'https://via.placeholder.com/80', // Placeholder image
-                                        width: 80.0,
-                                        height: 80.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 4.0, 0.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${listViewOrdersRecord.items.length} item(s)', // Display number of items in the order
-                                            style: FlutterFlowTheme.of(context).headlineSmall,
+
+                        return FutureBuilder<DocumentSnapshot>(
+                          future: listViewOrdersRecord.items.first.planRef?.get(),
+                          builder: (context, planSnapshot) {
+                            if (planSnapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                            if (planSnapshot.hasError) {
+                              return Center(child: Text('Error: ${planSnapshot.error}'));
+                            }
+                            if (!planSnapshot.hasData || planSnapshot.data == null) {
+                              return Center(child: Text('Document does not exist.'));
+                            }
+
+
+                              final planDetails = PlansRecord.fromSnapshot(planSnapshot.data!);
+                              // Continue building your widget using planDetails...
+
+                            return Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 8.0),
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 3.0,
+                                      color: Color(0x411D2429),
+                                      offset: Offset(0.0, 1.0),
+                                    )
+                                  ],
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(0.0, 1.0, 1.0, 1.0),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(6.0),
+                                          child: Image.network(
+                                            planDetails.image.isNotEmpty ? planDetails.image : 'https://via.placeholder.com/80', // Placeholder image
+                                            width: 80.0,
+                                            height: 80.0,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              // This builder handles any errors loading the image, such as if the image cannot be found at the URL
+                                              return Icon(Icons.error); // You can return an error icon or any other widget if the image fails to load
+                                            },
                                           ),
-                                          Padding(
-                                            padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 8.0, 0.0),
-                                            child: AutoSizeText(
-                                              'Status: ${listViewOrdersRecord.status}', // Display the order status
-                                              style: FlutterFlowTheme.of(context).labelMedium,
-                                            ),
-                                          ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 4.0, 0.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                planDetails.item, // Use the plan name here
+                                                style: FlutterFlowTheme.of(context).headlineSmall,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 8.0, 0.0),
+                                                child: AutoSizeText(
+                                                  'Status: ${listViewOrdersRecord.status}', // Display the order status
+                                                  style: FlutterFlowTheme.of(context).labelMedium,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 4.0, 8.0),
+                                        child: Text(
+                                          dateTimeFormat('MMMEd', listViewOrdersRecord.timestamp!),
+                                          textAlign: TextAlign.end,
+                                          style: FlutterFlowTheme.of(context).bodyMedium,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 4.0, 8.0),
-                                    child: Text(
-                                      dateTimeFormat('MMMEd', listViewOrdersRecord.timestamp!),
-                                      textAlign: TextAlign.end,
-                                      style: FlutterFlowTheme.of(context).bodyMedium,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         );
                       },
                     );
+
 
                   },
                 ),
