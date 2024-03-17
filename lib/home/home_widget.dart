@@ -1,3 +1,4 @@
+import '../cart_icon_widget.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -84,7 +85,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 'Home',
                 style: FlutterFlowTheme.of(context).titleLarge,
               ),
-              actions: [],
+              actions: [ CartIconWidget(),],
               centerTitle: false,
               elevation: 0.0,
             ),
@@ -106,7 +107,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            context.pushNamed('plans');
+                            context.goNamed('plans');
                           },
                           child: Container(
                             width: 395.0,

@@ -117,6 +117,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               params.isEmpty ? NavBarPage(initialPage: 'Home') : HomeWidget(),
         ),
         FFRoute(
+          name: 'plans',
+          path: '/plans',
+          builder: (context, state) => PlansWidget(),
+        ),
+        FFRoute(
+          name: 'menuitems',
+          path: '/menuitems',
+          builder: (context, state) => MenuitemsWidget(),
+        ),
+        FFRoute(
           name: 'login',
           path: '/login',
           builder: (context, params) => LoginWidget(),
@@ -137,19 +147,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
                 ParamType.DocumentReference, false, ['restaurant']),
           ),
         ),
-        FFRoute(
-          name: 'menuitems',
-          path: '/menuitems',
-          builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'menuitems')
-              : MenuitemsWidget(),
-        ),
-        FFRoute(
-          name: 'plans',
-          path: '/plans',
-          builder: (context, params) =>
-              params.isEmpty ? NavBarPage(initialPage: 'plans') : PlansWidget(),
-        ),
+        // FFRoute(
+        //   name: 'menuitems',
+        //   path: '/menuitems',
+        //   builder: (context, params) => params.isEmpty
+        //       ? NavBarPage(initialPage: 'menuitems')
+        //       : MenuitemsWidget(),
+        // ),
+
         FFRoute(
           name: 'buynowplans',
           path: '/buynowplans',

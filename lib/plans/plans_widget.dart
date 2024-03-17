@@ -1,3 +1,4 @@
+import '../cart_icon_widget.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -29,6 +30,7 @@ class _PlansWidgetState extends State<PlansWidget> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
+
 
   @override
   void dispose() {
@@ -66,8 +68,9 @@ class _PlansWidgetState extends State<PlansWidget> {
             hoverColor: Colors.transparent,
             highlightColor: Colors.transparent,
             onTap: () async {
-              context.pop();
+              GoRouter.of(context).go('/home'); // Use context.pop() to go back to the previous page.
             },
+
             child: Icon(
               Icons.chevron_left_rounded,
               color: FlutterFlowTheme.of(context).primaryText,
@@ -78,7 +81,9 @@ class _PlansWidgetState extends State<PlansWidget> {
             'Our Plans',
             style: FlutterFlowTheme.of(context).headlineMedium,
           ),
-          actions: [],
+          actions: <Widget>[
+            CartIconWidget(),
+          ],
           centerTitle: false,
           elevation: 0.0,
         ),
@@ -185,17 +190,7 @@ class _PlansWidgetState extends State<PlansWidget> {
                                                   FlutterFlowTheme.of(context)
                                                       .headlineSmall,
                                             ),
-                                            Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(0.0, 4.0, 8.0, 0.0),
-                                              child: AutoSizeText(
-                                                'Subtext',
-                                                textAlign: TextAlign.start,
-                                                style:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelMedium,
-                                              ),
-                                            ),
+
                                           ],
                                         ),
                                       ),
@@ -235,5 +230,7 @@ class _PlansWidgetState extends State<PlansWidget> {
         ),
       ),
     );
+
   }
+
 }

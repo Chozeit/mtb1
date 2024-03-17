@@ -1,3 +1,4 @@
+import '../cart_icon_widget.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -107,7 +108,7 @@ class _BuynowplansWidgetState extends State<BuynowplansWidget> {
                 'Our Plans',
                 style: FlutterFlowTheme.of(context).headlineMedium,
               ),
-              actions: [],
+              actions: [ CartIconWidget(),],
               centerTitle: false,
               elevation: 0.0,
             ),

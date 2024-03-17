@@ -24,6 +24,9 @@ class _CartViewWidgetState extends State<CartViewWidget> {
   // bool get isCheckoutEnabled => FFAppState().cart.length == 1;
   // String? get errorMessage => isCheckoutEnabled ? null : 'Please add exactly one plan to the cart before checkout.';
   bool get isCheckoutEnabled {
+    if (FFAppState().cart.isEmpty) {
+      return false;
+    }
     // Count items per meal plan.
     final Map<String, int> mealPlanCounts = {};
     for (final cartItem in FFAppState().cart) {
@@ -123,6 +126,7 @@ class _CartViewWidgetState extends State<CartViewWidget> {
         appBar: AppBar(
           backgroundColor: FlutterFlowTheme.of(context).tertiary,
           automaticallyImplyLeading: false,
+
           title: Text(
             'My Cart',
             style: FlutterFlowTheme.of(context).displaySmall,
@@ -409,7 +413,7 @@ class _CartViewWidgetState extends State<CartViewWidget> {
               onTap: isCheckoutEnabled ? () => navigateToCheckout(context) : null,
               child: Container(
                 width: double.infinity,
-                height: 100.0,
+                height: 60,
                 decoration: BoxDecoration(
                   color: /*FlutterFlowTheme.of(context).primary,*/
                   isCheckoutEnabled ? FlutterFlowTheme.of(context).primary : Colors.grey,
@@ -428,6 +432,11 @@ class _CartViewWidgetState extends State<CartViewWidget> {
                   ),
                 ),
                 alignment: AlignmentDirectional(0.0, 0.0),
+                child: InkWell(
+                  onTap: isCheckoutEnabled
+                      ? () => navigateToCheckout(context)
+                      : null, // Prevents the button action when the cart is empty
+                  child: Center(
                 child: Text(
                   'Checkout(${formatNumber(
                     FFAppState().cartSum,
@@ -436,8 +445,12 @@ class _CartViewWidgetState extends State<CartViewWidget> {
                     format: '',
                     locale: '',
                   )})',
-                  style: FlutterFlowTheme.of(context).titleMedium,
+                  style: FlutterFlowTheme.of(context).titleMedium.copyWith(
+                    color: isCheckoutEnabled ? Colors.white : Colors.black, // Change text color based on isCheckoutEnabled
+                  ),
                 ),
+              ),
+              ),
               ),
             ),
           ],

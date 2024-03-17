@@ -4,6 +4,8 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class ForgotPasswordWidget extends StatefulWidget {
   const ForgotPasswordWidget({Key? key}) : super(key: key);
@@ -50,12 +52,47 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                   text: 'Send Reset Link',
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      await FirebaseAuth.instance.sendPasswordResetEmail(
-                        email: _emailController.text.trim(),
-                      );
-                      // Show a confirmation dialog or Snackbar
+                      // Hide the keyboard
+                      FocusScope.of(context).unfocus();
+
+                      final email = _emailController.text.trim();
+                      final usersQuery = await FirebaseFirestore.instance
+                          .collection('users')
+                          .where('email', isEqualTo: email)
+                          .limit(1)
+                          .get();
+
+                      if (usersQuery.docs.isNotEmpty) {
+                        try {
+                          await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Password reset link has been sent to your email.'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          // Use GoRouter to navigate to the login page.
+                          GoRouter.of(context).go('/login');
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error occurred while sending reset link.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Email address not found.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   },
+
+
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 50,

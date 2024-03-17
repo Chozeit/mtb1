@@ -121,35 +121,70 @@ class NavBarPage extends StatefulWidget {
 /// This is the private State class that goes with NavBarPage.
 class _NavBarPageState extends State<NavBarPage> {
   String _currentPageName = 'Home';
-  late Widget? _currentPage;
+  Widget? _currentPage;
+  late int _currentIndex = 0;
+
+  final List<String> _pageKeys = [
+    'Home',
+    // 'menuitems',
+    'cartView',
+    'Profile',
+  ];
+
+  final Map<String, Widget> tabs = {
+    'Home': HomeWidget(),
+    // 'menuitems': MenuitemsWidget(),
+    'cartView': CartViewWidget(),
+    'Profile': ProfileWidget(),
+  };
+
 
   @override
   void initState() {
     super.initState();
-    _currentPageName = widget.initialPage ?? _currentPageName;
-    _currentPage = widget.page;
+    // _currentPageName = widget.initialPage ?? _currentPageName;
+    // _currentPage = widget.page;
+    // _currentIndex = tabs.keys.toList().indexOf(_currentPageName);
+    if (widget.initialPage != null && _pageKeys.contains(widget.initialPage)) {
+      _currentIndex = _pageKeys.indexOf(widget.initialPage!);
+      _currentPageName = widget.initialPage!;
+    } else {
+      // Fallback to the first tab as default
+      _currentPageName = _pageKeys.first;
+    }
+    _currentPage = tabs[_currentPageName];
   }
 
   @override
   Widget build(BuildContext context) {
+    //
+    // final tabs = {
+    //   'Home': HomeWidget(),
+    //   'menuitems': MenuitemsWidget(),
+    //   'cartView': CartViewWidget(),
+    //   'Profile': ProfileWidget(),
+    // };
+    // final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
 
-    final tabs = {
-      'Home': HomeWidget(),
-      'plans': PlansWidget(),
-      'menuitems': MenuitemsWidget(),
-      'cartView': CartViewWidget(),
-      'Profile': ProfileWidget(),
-    };
-    final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
+    final currentPage = tabs[_pageKeys[_currentIndex]];
 
     return Scaffold(
       body: _currentPage ?? tabs[_currentPageName],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (i) => setState(() {
-          _currentPage = null;
-          _currentPageName = tabs.keys.toList()[i];
-        }),
+        currentIndex: _currentIndex,
+        // onTap: (i) => setState(() {
+        //   _currentPage = null;
+        //   _currentPageName = tabs.keys.toList()[i];
+        // }),
+        onTap: (index) {
+          if (index < _pageKeys.length) {
+            setState(() {
+              _currentIndex = index;
+              _currentPageName = _pageKeys[index];
+              _currentPage = tabs[_currentPageName];
+            });
+          }
+        },
         backgroundColor: Colors.white,
         selectedItemColor: FlutterFlowTheme.of(context).primary,
         unselectedItemColor: FlutterFlowTheme.of(context).tertiary,
@@ -165,22 +200,14 @@ class _NavBarPageState extends State<NavBarPage> {
             label: 'Home',
             tooltip: '',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.shopping_cart,
-              size: 24.0,
-            ),
-            label: 'Shop',
-            tooltip: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.menu_book,
-              size: 24.0,
-            ),
-            label: 'Menu',
-            tooltip: '',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(
+          //     Icons.menu_book,
+          //     size: 24.0,
+          //   ),
+          //   label: 'Menu',
+          //   tooltip: '',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.shopping_cart,
@@ -198,7 +225,7 @@ class _NavBarPageState extends State<NavBarPage> {
               Icons.account_circle_sharp,
               size: 24.0,
             ),
-            label: '__',
+            label: 'Profile',
             tooltip: '',
           )
         ],

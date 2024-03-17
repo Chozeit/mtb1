@@ -1,3 +1,4 @@
+import '../cart_icon_widget.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -66,7 +67,7 @@ class _MenuitemsWidgetState extends State<MenuitemsWidget> {
             hoverColor: Colors.transparent,
             highlightColor: Colors.transparent,
             onTap: () async {
-              context.pop();
+              GoRouter.of(context).go('/home'); // Use context.pop() to go back to the previous page.
             },
             child: Icon(
               Icons.chevron_left_rounded,
@@ -78,7 +79,7 @@ class _MenuitemsWidgetState extends State<MenuitemsWidget> {
             'Our Menu',
             style: FlutterFlowTheme.of(context).headlineMedium,
           ),
-          actions: [],
+          actions: [ CartIconWidget(),],
           centerTitle: false,
           elevation: 0.0,
         ),
@@ -185,50 +186,9 @@ class _MenuitemsWidgetState extends State<MenuitemsWidget> {
                                                   FlutterFlowTheme.of(context)
                                                       .headlineSmall,
                                             ),
-                                            Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(0.0, 4.0, 8.0, 0.0),
-                                              child: AutoSizeText(
-                                                'Subtext',
-                                                textAlign: TextAlign.start,
-                                                style:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelMedium,
-                                              ),
-                                            ),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                    Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 4.0, 0.0, 0.0),
-                                          child: Icon(
-                                            Icons.chevron_right_rounded,
-                                            color: Color(0xFF57636C),
-                                            size: 24.0,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 12.0, 4.0, 8.0),
-                                          child: Text(
-                                            '\$11.00',
-                                            textAlign: TextAlign.end,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium,
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ],
                                 ),

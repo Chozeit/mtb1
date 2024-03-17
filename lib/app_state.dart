@@ -50,10 +50,12 @@ class FFAppState extends ChangeNotifier {
 
   void removeFromCart(CartItemTypeStruct _value) {
     _cart.remove(_value);
+    notifyListeners();
   }
 
   void removeAtIndexFromCart(int _index) {
     _cart.removeAt(_index);
+    notifyListeners();
   }
 
   void updateCartAtIndex(
