@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'CheckoutDetails.dart';
 import 'checkout_model.dart';
 export 'checkout_model.dart';
 
@@ -354,25 +355,13 @@ class _CheckoutWidgetState extends State<CheckoutWidget> {
                         EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 12.0),
                     child: FFButtonWidget(
                       onPressed: () async {
-                        final ordersDocRef = OrdersRecord.createDoc();
-
-                        // Now set the data for the new order document including the user details
-                        final orderData = createOrdersRecordData(
-                          uid: FirebaseAuth.instance.currentUser!.uid, // Get the current user's UID
-                          timestamp: DateTime.now(),
-                          status: 'New',
-                          fullName: _model.textController1.text, // Full Name
-                          classAndSection: _model.textController2.text, // Class and Section
-                          school: _model.textController4.text, // School Name
-                          phoneNumber: _model.textController5.text, // Phone Number
-                          specialInstructions: _model.textController3.text, // Special Instructions
-                          // ... include other order details here
+                        Provider.of<CheckoutDetails>(context, listen: false).updateDetails(
+                          fullName: _model.textController1.text,
+                          classAndSection: _model.textController2.text,
+                          school: _model.textController4.text,
+                          phoneNumber: _model.textController5.text,
+                          specialInstructions: _model.textController3.text,
                         );
-
-                        // Save the order to Firestore
-                        await ordersDocRef.set(orderData);
-
-                        // Navigate to the payment page or order confirmation page
                         context.goNamed('payments');
                       },
                       text: 'Submit and Proceed',

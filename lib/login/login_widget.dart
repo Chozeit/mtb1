@@ -248,7 +248,7 @@ class _LoginWidgetState extends State<LoginWidget>
                                                   ],
                                                   obscureText: false,
                                                   decoration: InputDecoration(
-                                                    labelText: 'Email',
+                                                    labelText: 'Enter Email',
                                                     labelStyle: FlutterFlowTheme
                                                             .of(context)
                                                         .titleMedium
@@ -348,7 +348,7 @@ class _LoginWidgetState extends State<LoginWidget>
                                                   obscureText:
                                                       !_model.passwordVisibility1,
                                                   decoration: InputDecoration(
-                                                    labelText: 'Password',
+                                                    labelText: 'Enter Password',
                                                     labelStyle: FlutterFlowTheme
                                                             .of(context)
                                                         .titleMedium
@@ -468,7 +468,7 @@ class _LoginWidgetState extends State<LoginWidget>
                                                   obscureText:
                                                       !_model.password2Visibility,
                                                   decoration: InputDecoration(
-                                                    labelText: 'Password',
+                                                    labelText: 'Re-Enter Password',
                                                     labelStyle: FlutterFlowTheme
                                                             .of(context)
                                                         .titleMedium
@@ -1387,17 +1387,9 @@ class _LoginWidgetState extends State<LoginWidget>
                                                         0.0, 0.0, 0.0, 16.0),
                                                 child: FFButtonWidget(
                                                   onPressed: () async {
-                                                    GoRouter.of(context)
-                                                        .prepareAuthEvent();
-                                                    final user = await authManager
-                                                        .signInWithGoogle(
-                                                            context);
-                                                    if (user == null) {
-                                                      return;
-                                                    }
 
-                                                    context.goNamedAuth(
-                                                        'Home', context.mounted);
+
+                                                    context.goNamed('ForgotPassword');
                                                   },
                                                   text: 'Forgot Password?',
                                                   options: FFButtonOptions(

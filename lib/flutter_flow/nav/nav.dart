@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mtb1/forgotPassword/ForgotPasswordWidget.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import '/backend/backend.dart';
@@ -86,7 +87,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
 
     // If trying to navigate to a protected route while not logged in, redirect to login
         final bool isLoggingIn = state.location == '/login';
-         if (!isLoggedIn && !isLoggingIn) {
+        final bool isLoggingInOrResettingPassword = state.location == '/login' || state.location == '/forgotPassword';
+
+        if (!isLoggedIn && !isLoggingInOrResettingPassword) {
            return '/login';
           }
 
@@ -171,6 +174,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'payments',
           path: '/payments',
           builder: (context, params) => PaymentsWidget(),
+        ),
+        FFRoute(
+          name: 'ForgotPassword',
+          path: '/forgotPassword',
+          builder: (context, params) => ForgotPasswordWidget(),
         ),
         FFRoute(
           name: 'Profile',

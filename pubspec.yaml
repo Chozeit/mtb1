@@ -115,6 +115,7 @@ flutter:
     - assets/prof.png
 
 flutter_native_splash:
+  color: "ffffff"
   image: assets/mtb_logo.png
   android: true
   ios: true

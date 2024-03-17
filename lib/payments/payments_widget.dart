@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../checkout/CheckoutDetails.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_credit_card_form.dart';
@@ -23,14 +24,12 @@ class PaymentsWidget extends StatefulWidget {
 
 class _PaymentsWidgetState extends State<PaymentsWidget> {
   late PaymentsModel _model;
-
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => PaymentsModel());
-
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
@@ -43,6 +42,7 @@ class _PaymentsWidgetState extends State<PaymentsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    CheckoutDetails checkoutDetails = Provider.of<CheckoutDetails>(context);
     if (isiOS) {
       SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
@@ -109,6 +109,7 @@ class _PaymentsWidgetState extends State<PaymentsWidget> {
                 child: FFButtonWidget(
                   onPressed: () async {
                     final user = FirebaseAuth.instance.currentUser;
+                    final checkoutDetails = Provider.of<CheckoutDetails>(context, listen: false);
                     if (user != null) {
                       final ordersDocRef = FirebaseFirestore.instance.collection('orders').doc();// Create a new document reference for the order
 
@@ -117,6 +118,11 @@ class _PaymentsWidgetState extends State<PaymentsWidget> {
                         timestamp: getCurrentTimestamp,
                         status: 'New',
                         uid: user.uid, // Include the current user's UID
+                        fullName: checkoutDetails.fullName,
+                        classAndSection: checkoutDetails.classAndSection,
+                        school: checkoutDetails.school,
+                        phoneNumber: checkoutDetails.phoneNumber,
+                        specialInstructions: checkoutDetails.specialInstructions,
                       );
 
                       // Combine order items data with other order data

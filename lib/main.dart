@@ -9,6 +9,7 @@ import 'auth/firebase_auth/firebase_user_provider.dart';
 import 'auth/firebase_auth/auth_util.dart';
 
 import 'backend/firebase/firebase_config.dart';
+import 'checkout/CheckoutDetails.dart';
 import 'flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,8 +25,18 @@ void main() async {
   await appState.initializePersistedState();
 
 
-  runApp(ChangeNotifierProvider(
-    create: (context) => appState,
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => appState),
+      ChangeNotifierProvider(create: (context) => CheckoutDetails(
+        fullName: '',
+        classAndSection: '',
+        school: '',
+        phoneNumber: '',
+        specialInstructions: '',
+      )),
+      // Add other providers here if needed
+    ],
     child: MyApp(),
   ));
 }
