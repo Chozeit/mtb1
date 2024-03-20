@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mtb1/forgotPassword/ForgotPasswordWidget.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import '../../student/student_details.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 
@@ -196,6 +197,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'orders',
           path: '/orders',
           builder: (context, params) => OrdersWidget(),
+        ),
+        FFRoute(
+          name: 'students',
+          path: '/student',
+          builder: (context, params) => StudentDetailsForm(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
 
