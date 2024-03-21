@@ -201,7 +201,12 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: 'students',
           path: '/student',
-          builder: (context, params) => StudentDetailsForm(),
+          builder: (context, params) {
+
+            final String uid = params.getParam('uid', ParamType.String);
+            return StudentDetailsForm(uid: uid);
+
+          },
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
 

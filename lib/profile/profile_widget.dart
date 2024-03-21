@@ -184,7 +184,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   hoverColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   onTap: () async {
-                    context.pushNamed('students');
+                    String? uid = FirebaseAuth.instance.currentUser?.uid;
+                    if (uid != null) {
+                      context.go('/student', extra: {'uid': uid});
+                    }
                   },
                   child: Container(
                     width: double.infinity,

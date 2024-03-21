@@ -1,3 +1,4 @@
+import '../student/student_details.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_button_tabbar.dart';
@@ -1150,8 +1151,18 @@ class _LoginWidgetState extends State<LoginWidget>
                                                       return;
                                                     }
 
-                                                    context.goNamedAuth(
-                                                        'students', context.mounted);
+                                                    /*context.goNamedAuth(
+                                                        'students', context.mounted);*/
+                                                    if (user != null) {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(builder: (context) => StudentDetailsForm(uid: user.uid!)),
+                                                      );
+                                                    } else {
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(content: Text('An error occurred. Please try again.')),
+                                                      );
+                                                    }
                                                   },
                                                   text: 'Sign In',
                                                   options: FFButtonOptions(
