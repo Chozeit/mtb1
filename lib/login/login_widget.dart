@@ -1156,7 +1156,7 @@ class _LoginWidgetState extends State<LoginWidget>
                                                     if (user != null) {
                                                       Navigator.push(
                                                         context,
-                                                        MaterialPageRoute(builder: (context) => StudentDetailsForm(uid: user.uid!)),
+                                                        MaterialPageRoute(builder: (context) => StudentDetailsForm(uid: user.uid!, showSkipButton: true)),
                                                       );
                                                     } else {
                                                       ScaffoldMessenger.of(context).showSnackBar(

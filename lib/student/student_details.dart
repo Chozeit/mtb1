@@ -7,7 +7,13 @@ import '../flutter_flow/flutter_flow_widgets.dart';
 
 class StudentDetailsForm extends StatefulWidget {
   final String uid;
-  StudentDetailsForm({Key? key, required this.uid}) : super(key: key);
+  final bool showSkipButton;
+
+  StudentDetailsForm({
+    Key? key,
+    required this.uid,
+    this.showSkipButton = false, // Default value is false
+  }) : super(key: key);
   @override
   _StudentDetailsFormState createState() => _StudentDetailsFormState();
 }
@@ -69,16 +75,40 @@ class _StudentDetailsFormState extends State<StudentDetailsForm> {
 
 
   Future<void> _submitForm() async {
+    // Check if there are already students added
     if (_students.isNotEmpty) {
       print("Submitting form with students list: $_students");
       await _addStudentToFirestore();
       GoRouter.of(context).go('/home');
     } else {
-      print("No students to submit, current students list: $_students");
-      // Show a message to the user that at least one student should be added
-      // Consider showing a dialog or a Snackbar here
+      // No students added yet, validate and add the current form's student
+      if (_formKey.currentState!.validate()) {
+        final newStudent = {
+          'studentName': _studentNameController.text,
+          'studentClass': _studentClassController.text,
+          'studentSection': _studentSectionController.text,
+          'schoolName': _schoolNameController.text,
+          'specialInstructions': _specialInstructionsController.text,
+        };
+
+        setState(() {
+          _students.add(newStudent);
+          _studentNameController.clear();
+          _studentClassController.clear();
+          _studentSectionController.clear();
+          _schoolNameController.clear();
+          _specialInstructionsController.clear();
+        });
+
+        print("New student added and submitting: $newStudent");
+        await _addStudentToFirestore();
+        GoRouter.of(context).go('/home');
+      } else {
+        print("Form is not valid. Please review the information.");
+      }
     }
   }
+
 
 
   @override
@@ -117,159 +147,188 @@ class _StudentDetailsFormState extends State<StudentDetailsForm> {
         elevation: 0.0,
       ),
       body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              for (var student in _students)
-                ListTile(
-                  title: Text(student['studentName']),
-                  subtitle: Text('${student['studentClass']} - ${student['studentSection']}'),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      setState(() {
-                        _students.remove(student);
-                      });
-                    },
-                  ),
-                ),
-              TextFormField(
-                controller: _studentNameController,
-                decoration: InputDecoration(labelText: 'Student Name'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter the student\'s name';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _schoolNameController,
-                decoration: InputDecoration(labelText: 'School Name'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter the School\'s name';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _studentClassController,
-                decoration: InputDecoration(labelText: 'Class'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter the class';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _studentSectionController,
-                decoration: InputDecoration(labelText: 'Section'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter the Section';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _specialInstructionsController,
-                decoration: InputDecoration(labelText: 'Special Instructions'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter NA if there are no instructions';
-                  }
-                  return null;
-                },
-              ),
-              // Add more fields here
-              FFButtonWidget(
-                onPressed: () async {
-                  // String mealPlanId =
-                  _addStudent();
-                },
-                text: 'Add Student',
-                options: FFButtonOptions(
-                  width: 120.0,
-                  height: 30.0,
-                  padding:
-                  EdgeInsetsDirectional
-                      .fromSTEB(24.0, 0.0,
-                      24.0, 0.0),
-                  iconPadding:
-                  EdgeInsetsDirectional
-                      .fromSTEB(0.0, 0.0,
-                      0.0, 0.0),
-                  color: FlutterFlowTheme.of(
-                      context)
-                      .primary,
-                  textStyle: FlutterFlowTheme
-                      .of(context)
-                      .titleSmall
-                      .override(
-                    fontFamily: 'Inter',
-                    color: Colors.white,
-                  ),
-                  elevation: 3.0,
-                  borderSide: BorderSide(
-                    color: Colors.transparent,
-                    width: 1.0,
-                  ),
-                  borderRadius:
-                  BorderRadius.circular(
-                      16.0),
+        child: Column(
+          children: [
+            for (var student in _students)
+              ListTile(
+                title: Text(student['studentName']),
+                subtitle: Text('${student['studentClass']} - ${student['studentSection']}'),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      _students.remove(student);
+                    });
+                  },
                 ),
               ),
-              FFButtonWidget(
-                onPressed: () async {
-                  // String mealPlanId =
-                  _submitForm();
-                },
-                text: 'Submit',
-                options: FFButtonOptions(
-                  width: 120.0,
-                  height: 30.0,
-                  padding:
-                  EdgeInsetsDirectional
-                      .fromSTEB(24.0, 0.0,
-                      24.0, 0.0),
-                  iconPadding:
-                  EdgeInsetsDirectional
-                      .fromSTEB(0.0, 0.0,
-                      0.0, 0.0),
-                  color: FlutterFlowTheme.of(
-                      context)
-                      .primary,
-                  textStyle: FlutterFlowTheme
-                      .of(context)
-                      .titleSmall
-                      .override(
-                    fontFamily: 'Inter',
-                    color: Colors.white,
+            Container(
+              margin: EdgeInsets.all(16), // Adjust the margin as needed
+              padding: EdgeInsets.all(16), // Adjust padding as needed
+              decoration: BoxDecoration(
+                color: Colors.white, // Background color of the box
+                borderRadius: BorderRadius.circular(12), // Border radius of the box
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
                   ),
-                  elevation: 3.0,
-                  borderSide: BorderSide(
-                    color: Colors.transparent,
-                    width: 1.0,
-                  ),
-                  borderRadius:
-                  BorderRadius.circular(
-                      16.0),
-                ),
+                ],
               ),
-              TextButton(
-                onPressed: () {
-                  GoRouter.of(context).go('/home');
-                },
-                child: Text('Skip for Now',),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+
+                    TextFormField(
+                      controller: _studentNameController,
+                      decoration: InputDecoration(labelText: 'Student Name'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter the student\'s name';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _schoolNameController,
+                      decoration: InputDecoration(labelText: 'School Name'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter the School\'s name';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _studentClassController,
+                      decoration: InputDecoration(labelText: 'Class'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter the class';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _studentSectionController,
+                      decoration: InputDecoration(labelText: 'Section'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter the Section';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _specialInstructionsController,
+                      decoration: InputDecoration(labelText: 'Special Instructions'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter NA if there are no instructions';
+                        }
+                        return null;
+                      },
+                    ),
+                    // Add more fields here
+                    FFButtonWidget(
+                      onPressed: () async {
+                        // String mealPlanId =
+                        _addStudent();
+                      },
+                      text: 'Add Student',
+                      options: FFButtonOptions(
+                        width: 120.0,
+                        height: 30.0,
+                        padding:
+                        EdgeInsetsDirectional
+                            .fromSTEB(24.0, 0.0,
+                            24.0, 0.0),
+                        iconPadding:
+                        EdgeInsetsDirectional
+                            .fromSTEB(0.0, 0.0,
+                            0.0, 0.0),
+                        color: FlutterFlowTheme.of(
+                            context)
+                            .primary,
+                        textStyle: FlutterFlowTheme
+                            .of(context)
+                            .titleSmall
+                            .override(
+                          fontFamily: 'Inter',
+                          color: Colors.white,
+                        ),
+                        elevation: 3.0,
+                        borderSide: BorderSide(
+                          color: Colors.transparent,
+                          width: 1.0,
+                        ),
+                        borderRadius:
+                        BorderRadius.circular(
+                            16.0),
+                      ),
+                    ),
+                    FFButtonWidget(
+                      onPressed: () async {
+                        // String mealPlanId =
+                        _submitForm();
+                      },
+                      text: 'Submit',
+                      options: FFButtonOptions(
+                        width: 120.0,
+                        height: 30.0,
+                        padding:
+                        EdgeInsetsDirectional
+                            .fromSTEB(24.0, 0.0,
+                            24.0, 0.0),
+                        iconPadding:
+                        EdgeInsetsDirectional
+                            .fromSTEB(0.0, 0.0,
+                            0.0, 0.0),
+                        color: FlutterFlowTheme.of(
+                            context)
+                            .primary,
+                        textStyle: FlutterFlowTheme
+                            .of(context)
+                            .titleSmall
+                            .override(
+                          fontFamily: 'Inter',
+                          color: Colors.white,
+                        ),
+                        elevation: 3.0,
+                        borderSide: BorderSide(
+                          color: Colors.transparent,
+                          width: 1.0,
+                        ),
+                        borderRadius:
+                        BorderRadius.circular(
+                            16.0),
+                      ),
+                    ),
+                    Builder(
+                        builder: (context) {
+                          if(!widget.showSkipButton){
+                            return Container();
+                          }
+                          return TextButton(
+                            onPressed: () {
+                              GoRouter.of(context).go('/home');
+                            },
+                            child: Text('Skip for Now',),
 
 
+                          );
+                        }
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
+            )
+          ],
+        )
+
       ),
     );
   }
