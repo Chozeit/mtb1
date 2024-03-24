@@ -20,7 +20,7 @@ class StudentDetailsForm extends StatefulWidget {
 
 class _StudentDetailsFormState extends State<StudentDetailsForm> {
   final _formKey = GlobalKey<FormState>();
-  final List<Map<String, dynamic>> _students = [];
+  late List<Map<String, dynamic>> _students = [];
 
   // Student Detail Controllers
   final _studentNameController = TextEditingController();
@@ -28,10 +28,29 @@ class _StudentDetailsFormState extends State<StudentDetailsForm> {
   final _studentSectionController = TextEditingController();
   final _schoolNameController = TextEditingController();
   final _specialInstructionsController = TextEditingController();
+  String? editingStudentId;
+  @override
+  void initState() {
+    super.initState();
+    fetchStudents();
+  }
 
+  void fetchStudents() async {
+    final userUid = widget.uid;
+    final collection = FirebaseFirestore.instance.collection('users').doc(userUid).collection('studentDetails');
+    final snapshot = await collection.get();
 
+    // Include document ID in the data
+    final students = snapshot.docs.map((doc) => {
+      ...doc.data(),
+      'id': doc.id, // Include the Firestore document ID
+    }).toList();
 
-  void _addStudent() {
+    setState(() {
+      _students = students;
+    });
+  }
+  void _addOrUpdateStudent() {
     if (_formKey.currentState!.validate()) {
       final newStudent = {
         'studentName': _studentNameController.text,
@@ -39,23 +58,34 @@ class _StudentDetailsFormState extends State<StudentDetailsForm> {
         'studentSection': _studentSectionController.text,
         'schoolName': _schoolNameController.text,
         'specialInstructions': _specialInstructionsController.text,
+        'id': editingStudentId, // Include the editing ID if present
       };
 
-      setState(() {
-        _students.add(newStudent);
-        // Clear the controllers after adding the student to the list
-        _studentNameController.clear();
-        _studentClassController.clear();
-        _studentSectionController.clear();
-        _schoolNameController.clear();
-        _specialInstructionsController.clear();
-      });
+      if (editingStudentId == null) {
+        // Add new student
+        setState(() => _students.add(newStudent));
+      } else {
+        // Update existing student
+        final index = _students.indexWhere((student) => student['id'] == editingStudentId);
+        if (index != -1) {
+          setState(() => _students[index] = newStudent);
+        }
+      }
 
-      // Print the new student and the updated students list for debugging
-      print('New student added: $newStudent');
-      print('Current students list: $_students');
+      // Clear form and reset editing state
+      _resetForm();
     }
   }
+
+  void _resetForm() {
+    _studentNameController.clear();
+    _studentClassController.clear();
+    _studentSectionController.clear();
+    _schoolNameController.clear();
+    _specialInstructionsController.clear();
+    editingStudentId = null; // Reset editing state
+  }
+
   Future<void> _addStudentToFirestore() async {
     try {
       final userUid = widget.uid; // UID of the logged-in user
@@ -72,47 +102,41 @@ class _StudentDetailsFormState extends State<StudentDetailsForm> {
       // Possibly show an error message to the user
     }
   }
-
-
   Future<void> _submitForm() async {
-    // Check if there are already students added
-    if (_students.isNotEmpty) {
-      print("Submitting form with students list: $_students");
-      await _addStudentToFirestore();
-      GoRouter.of(context).go('/home');
-    } else {
-      // No students added yet, validate and add the current form's student
-      if (_formKey.currentState!.validate()) {
-        final newStudent = {
-          'studentName': _studentNameController.text,
-          'studentClass': _studentClassController.text,
-          'studentSection': _studentSectionController.text,
-          'schoolName': _schoolNameController.text,
-          'specialInstructions': _specialInstructionsController.text,
-        };
+    final userUid = widget.uid;
+    final collection = FirebaseFirestore.instance.collection('users').doc(userUid).collection('studentDetails');
 
-        setState(() {
-          _students.add(newStudent);
-          _studentNameController.clear();
-          _studentClassController.clear();
-          _studentSectionController.clear();
-          _schoolNameController.clear();
-          _specialInstructionsController.clear();
+    for (var student in _students) {
+      if (student.containsKey('id') && student['id'] != null) {
+        // Existing student - Update document
+        await collection.doc(student['id']).update({
+          'studentName': student['studentName'],
+          'studentClass': student['studentClass'],
+          'studentSection': student['studentSection'],
+          'schoolName': student['schoolName'],
+          'specialInstructions': student['specialInstructions'],
         });
-
-        print("New student added and submitting: $newStudent");
-        await _addStudentToFirestore();
-        GoRouter.of(context).go('/home');
       } else {
-        print("Form is not valid. Please review the information.");
+        // New student - Add document
+        // Create a new Map from the student and explicitly remove 'id' if it exists
+        final Map<String, dynamic> newStudentData = Map<String, dynamic>.from(student)..remove('id');
+        await collection.add(newStudentData);
       }
     }
+
+    // After submitting, reset any form state as necessary and navigate away
+    _resetFormAndState();
+    GoRouter.of(context).go('/home');
   }
+
+
+
 
 
 
   @override
   Widget build(BuildContext context) {
+    bool isEditing = editingStudentId != null;
     return Scaffold(
       appBar:AppBar(
         backgroundColor: FlutterFlowTheme.of(context).tertiary,
@@ -152,14 +176,65 @@ class _StudentDetailsFormState extends State<StudentDetailsForm> {
             for (var student in _students)
               ListTile(
                 title: Text(student['studentName']),
-                subtitle: Text('${student['studentClass']} - ${student['studentSection']}'),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    setState(() {
-                      _students.remove(student);
-                    });
-                  },
+                subtitle: Text('${student['studentClass']} - ${student['studentSection']} \n${student['schoolName']} \n${student['specialInstructions']}'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        setState(() {
+                          editingStudentId = student['id']; // Assume each student has a unique ID
+                          _studentNameController.text = student['studentName'];
+                          _studentClassController.text = student['studentClass'];
+                          _schoolNameController.text = student['schoolName'];
+                          _studentSectionController.text = student['studentSection'];
+                          _specialInstructionsController.text =student['specialInstructions'];
+                          // Add other fields accordingly
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () async {
+                        final bool confirmDelete = await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Delete Student'),
+                              content: Text('Do you want to delete this student?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: Text('No'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  child: Text('Yes'),
+                                ),
+                              ],
+                            );
+                          },
+                        ) ?? false;
+
+                        if (confirmDelete) {
+                          // Proceed to delete the student from Firestore and update the state
+                          if (student['id'] != null) {
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(widget.uid)
+                                .collection('studentDetails')
+                                .doc(student['id'])
+                                .delete();
+                          }
+                          setState(() {
+                            _students.remove(student);
+                          });
+                        }
+                      },
+                    ),
+
+                  ],
                 ),
               ),
             Container(
@@ -232,81 +307,47 @@ class _StudentDetailsFormState extends State<StudentDetailsForm> {
                         return null;
                       },
                     ),
+                    SizedBox(height: 20,),
                     // Add more fields here
-                    FFButtonWidget(
-                      onPressed: () async {
-                        // String mealPlanId =
-                        _addStudent();
-                      },
-                      text: 'Add Student',
-                      options: FFButtonOptions(
-                        width: 120.0,
-                        height: 30.0,
-                        padding:
-                        EdgeInsetsDirectional
-                            .fromSTEB(24.0, 0.0,
-                            24.0, 0.0),
-                        iconPadding:
-                        EdgeInsetsDirectional
-                            .fromSTEB(0.0, 0.0,
-                            0.0, 0.0),
-                        color: FlutterFlowTheme.of(
-                            context)
-                            .primary,
-                        textStyle: FlutterFlowTheme
-                            .of(context)
-                            .titleSmall
-                            .override(
-                          fontFamily: 'Inter',
-                          color: Colors.white,
+                    if (!isEditing)
+                       FFButtonWidget(
+                        onPressed: () async {
+                          // String mealPlanId =
+                          _addOrUpdateStudent();
+                        },
+                        text: 'Add Student',
+                        options: FFButtonOptions(
+                          width: 120.0,
+                          height: 30.0,
+                          padding:
+                          EdgeInsetsDirectional
+                              .fromSTEB(24.0, 0.0,
+                              24.0, 0.0),
+                          iconPadding:
+                          EdgeInsetsDirectional
+                              .fromSTEB(0.0, 0.0,
+                              0.0, 0.0),
+                          color: FlutterFlowTheme.of(
+                              context)
+                              .primary,
+                          textStyle: FlutterFlowTheme
+                              .of(context)
+                              .titleSmall
+                              .override(
+                            fontFamily: 'Inter',
+                            color: Colors.white,
+                          ),
+                          elevation: 3.0,
+                          borderSide: BorderSide(
+                            color: Colors.transparent,
+                            width: 1.0,
+                          ),
+                          borderRadius:
+                          BorderRadius.circular(
+                              16.0),
                         ),
-                        elevation: 3.0,
-                        borderSide: BorderSide(
-                          color: Colors.transparent,
-                          width: 1.0,
-                        ),
-                        borderRadius:
-                        BorderRadius.circular(
-                            16.0),
                       ),
-                    ),
-                    FFButtonWidget(
-                      onPressed: () async {
-                        // String mealPlanId =
-                        _submitForm();
-                      },
-                      text: 'Submit',
-                      options: FFButtonOptions(
-                        width: 120.0,
-                        height: 30.0,
-                        padding:
-                        EdgeInsetsDirectional
-                            .fromSTEB(24.0, 0.0,
-                            24.0, 0.0),
-                        iconPadding:
-                        EdgeInsetsDirectional
-                            .fromSTEB(0.0, 0.0,
-                            0.0, 0.0),
-                        color: FlutterFlowTheme.of(
-                            context)
-                            .primary,
-                        textStyle: FlutterFlowTheme
-                            .of(context)
-                            .titleSmall
-                            .override(
-                          fontFamily: 'Inter',
-                          color: Colors.white,
-                        ),
-                        elevation: 3.0,
-                        borderSide: BorderSide(
-                          color: Colors.transparent,
-                          width: 1.0,
-                        ),
-                        borderRadius:
-                        BorderRadius.circular(
-                            16.0),
-                      ),
-                    ),
+
                     Builder(
                         builder: (context) {
                           if(!widget.showSkipButton){
@@ -325,7 +366,120 @@ class _StudentDetailsFormState extends State<StudentDetailsForm> {
                   ],
                 ),
               ),
-            )
+            ),
+            if(!isEditing)
+              FFButtonWidget(
+                onPressed: () async {
+                  // Check if any of the text fields are not empty.
+                  bool isFormNotEmpty = [
+                    _studentNameController.text,
+                    _studentClassController.text,
+                    _studentSectionController.text,
+                    _schoolNameController.text,
+                    _specialInstructionsController.text,
+                  ].any((element) => element.isNotEmpty);
+
+                  if (isFormNotEmpty && !isEditing) {
+                    // If form is not empty and we are not in edit mode, ask the user.
+                    bool? addStudent = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Incomplete Form'),
+                          content: Text(
+                              'You have entered some details. Would you like to add this student?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: Text('Clear Form', style: TextStyle(color: Colors.red)),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: Text('Add Student',
+                                  style: TextStyle(color: Colors.green)),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (addStudent == true) {
+                      _addOrUpdateStudent();
+                    } else {
+                      _resetForm();
+                    }
+                  } else {
+                    // If form is empty or we are in edit mode, submit the form.
+                    await _submitForm();
+                  }
+                },
+                text: 'Submit',
+                options: FFButtonOptions(
+                  width: 120.0,
+                  height: 30.0,
+                  padding:
+                  EdgeInsetsDirectional
+                      .fromSTEB(24.0, 0.0,
+                      24.0, 0.0),
+                  iconPadding:
+                  EdgeInsetsDirectional
+                      .fromSTEB(0.0, 0.0,
+                      0.0, 0.0),
+                  color: FlutterFlowTheme.of(
+                      context)
+                      .primary,
+                  textStyle: FlutterFlowTheme
+                      .of(context)
+                      .titleSmall
+                      .override(
+                    fontFamily: 'Inter',
+                    color: Colors.white,
+                  ),
+                  elevation: 3.0,
+                  borderSide: BorderSide(
+                    color: Colors.transparent,
+                    width: 1.0,
+                  ),
+                  borderRadius:
+                  BorderRadius.circular(
+                      16.0),
+                ),
+              ),
+            if (isEditing)
+              FFButtonWidget(
+                onPressed: _saveEditedStudent,
+                text: 'Save', options: FFButtonOptions(
+                width: 120.0,
+                height: 30.0,
+                padding:
+                EdgeInsetsDirectional
+                    .fromSTEB(24.0, 0.0,
+                    24.0, 0.0),
+                iconPadding:
+                EdgeInsetsDirectional
+                    .fromSTEB(0.0, 0.0,
+                    0.0, 0.0),
+                color: FlutterFlowTheme.of(
+                    context)
+                    .primary,
+                textStyle: FlutterFlowTheme
+                    .of(context)
+                    .titleSmall
+                    .override(
+                  fontFamily: 'Inter',
+                  color: Colors.white,
+                ),
+                elevation: 3.0,
+                borderSide: BorderSide(
+                  color: Colors.transparent,
+                  width: 1.0,
+                ),
+                borderRadius:
+                BorderRadius.circular(
+                    16.0),
+              ),
+                // Button options...
+              ),
           ],
         )
 
@@ -341,5 +495,67 @@ class _StudentDetailsFormState extends State<StudentDetailsForm> {
     _schoolNameController.dispose();
     _specialInstructionsController.dispose();
     super.dispose();
+  }
+  void _saveEditedStudent() async {
+    if (_formKey.currentState!.validate()) {
+      if (editingStudentId == null) {
+        // Handle the case when there is no student ID to update
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No student selected to update.'),
+          ),
+        );
+        return;
+      }
+
+      final studentToUpdate = {
+        'studentName': _studentNameController.text,
+        'studentClass': _studentClassController.text,
+        'studentSection': _studentSectionController.text,
+        'schoolName': _schoolNameController.text,
+        'specialInstructions': _specialInstructionsController.text,
+        // No need to include 'id' here as it's used for lookup only
+      };
+
+      // Update in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.uid)
+          .collection('studentDetails')
+          .doc(editingStudentId)
+          .update(studentToUpdate)
+          .then((value) {
+        // Update the list state
+        final index = _students.indexWhere((student) => student['id'] == editingStudentId);
+        if (index != -1) {
+          setState(() {
+            _students[index] = {
+              ...studentToUpdate, // Spread in the updated data
+              'id': editingStudentId, // Ensure the 'id' field is preserved
+            };
+          });
+        }
+
+        _resetForm(); // This will clear the form and reset editing state
+      })
+          .catchError((error) {
+        print("Failed to update student: $error");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update student.'),
+          ),
+        );
+      });
+    }
+  }
+
+
+  void _resetFormAndState() {
+    _resetForm(); // Clear form fields.
+
+    // Additionally clear the list if needed, or navigate away.
+    if (_students.isEmpty) {
+      GoRouter.of(context).go('/home');
+    }
   }
 }
