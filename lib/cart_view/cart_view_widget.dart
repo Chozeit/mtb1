@@ -319,7 +319,7 @@ class _CartViewWidgetState extends State<CartViewWidget> {
                                       final containerPlansRecord = snapshot.data!;
                                       return Container(
                                         width: 450,
-                                        height: 200.0,
+                                        height: 240.0,
                                         decoration: BoxDecoration(
                                           color: FlutterFlowTheme.of(context)
                                               .secondaryBackground,
@@ -682,15 +682,21 @@ class _CartViewWidgetState extends State<CartViewWidget> {
   }
 
 
-// Mock implementation, replace with actual logic to retrieve unit price
   Future<double> fetchPriceForMealPlan(DocumentReference? planRef) async {
     if (planRef == null) return 0.0;
     final docSnapshot = await planRef.get();
     final planData = docSnapshot.data() as Map<String, dynamic>?;
 
-    return planData?['price'] ?? 0.0;
+    // Check if the price is an int and if so, convert it to a double
+    final price = planData?['price'];
+    if (price is int) {
+      return price.toDouble();
+    } else if (price is double) {
+      return price;
+    } else {
+      return 0.0; // Default return value if price is not found or in case of error
+    }
   }
-
 
 
 
