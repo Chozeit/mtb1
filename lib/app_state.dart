@@ -30,16 +30,6 @@ class FFAppState extends ChangeNotifier {
     _cart = _value;
   }
 
-  // void addToCart(PlansRecord selectedPlan) {
-  //   var newItem = CartItemTypeStruct(
-  //     planRef: selectedPlan.reference,
-  //     quantity: 1, // or any quantity logic you have
-  //     mealPlanId: selectedPlan.mealPlanId, // Ensure this exists in PlansRecord
-  //   );
-  //   // Directly add newItem to the _cart list
-  //   _cart.add(newItem);
-  //   notifyListeners(); // Notify listeners about the state change
-  // }
 // This method now directly accepts a CartItemTypeStruct object.
   void addToCart(CartItemTypeStruct newItem) {
     _cart.add(newItem);
@@ -69,7 +59,7 @@ class FFAppState extends ChangeNotifier {
     _cart.insert(_index, _value);
   }
 
-  double _cartSum = 0.0;
+  double _cartSum = 0;
   double get cartSum => _cartSum;
   set cartSum(double _value) {
     _cartSum = _value;

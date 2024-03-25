@@ -13,10 +13,15 @@ class CartItemTypeStruct extends FFFirebaseStruct {
     DocumentReference? planRef,
     int? quantity,
     String? mealPlanId, // Add mealPlanId
+    String? selectedStudentId, // New field for selected student ID
+    double? totalPrice,
     FirestoreUtilData firestoreUtilData = const FirestoreUtilData(),
+
   })  : _planRef = planRef,
         _quantity = quantity,
         _mealPlanId = mealPlanId, // Initialize mealPlanId
+        _selectedStudentId = selectedStudentId,
+        _totalPrice = totalPrice,
         super(firestoreUtilData);
 
   // "planRef" field.
@@ -36,11 +41,22 @@ class CartItemTypeStruct extends FFFirebaseStruct {
   String? get mealPlanId => _mealPlanId;
   set mealPlanId(String? val) => _mealPlanId = val;
 
+  String? _selectedStudentId;
+  String? get selectedStudentId => _selectedStudentId;
+  set selectedStudentId(String? val) => _selectedStudentId = val;
+
+  double? _totalPrice; // New field for total price
+  double? get totalPrice => _totalPrice;
+  set totalPrice(double? val) => _totalPrice = val;
+
+
   static CartItemTypeStruct fromMap(Map<String, dynamic> data) =>
       CartItemTypeStruct(
         planRef: data['planRef'] as DocumentReference?,
         quantity: castToType<int>(data['quantity']),
         mealPlanId: data['mealPlanId'] as String?, // Handle mealPlanId
+        selectedStudentId: data['selectedStudentId'] as String?,
+        totalPrice: data['totalPrice'] as double?,
       );
 
   static CartItemTypeStruct? maybeFromMap(dynamic data) => data is Map
@@ -51,6 +67,8 @@ class CartItemTypeStruct extends FFFirebaseStruct {
         'planRef': _planRef,
         'quantity': _quantity,
     'mealPlanId': _mealPlanId,
+    'selectedStudentId': _selectedStudentId,
+    'totalPrice': _totalPrice,
       }.withoutNulls;
 
   @override
@@ -66,7 +84,8 @@ class CartItemTypeStruct extends FFFirebaseStruct {
     'mealPlanId': serializeParam( // Serialize mealPlanId
       _mealPlanId,
       ParamType.String,
-    ),
+    ),'selectedStudentId': serializeParam(_selectedStudentId, ParamType.String),
+    'totalPrice': serializeParam(_totalPrice, ParamType.double),
       }.withoutNulls;
 
   static CartItemTypeStruct fromSerializableMap(Map<String, dynamic> data) =>
@@ -86,7 +105,8 @@ class CartItemTypeStruct extends FFFirebaseStruct {
           data['mealPlanId'],
           ParamType.String,
           false,
-        ),
+        ),selectedStudentId: deserializeParam(data['selectedStudentId'], ParamType.String, false),
+        totalPrice: deserializeParam(data['totalPrice'], ParamType.double, false),
       );
 
   @override
